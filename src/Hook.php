@@ -12,15 +12,15 @@ class Hook
     protected $testing = false;
 
     /**
-     * hookHasListeners
+     * hasListeners
      * Check if a given hook has any listeners configured.
      * 
      * @param  string $hook
      * @return boolean
      */
-    public function hookHasListeners(string $hook): boolean
+    public function hasListeners(string $hook): bool
     {
-        return array_key_exists($hook, $this->watch)) && is_array($this->watch[$hook]) && sizeof($this->watch[$hook]) > 0;
+        return array_key_exists($hook, $this->watch) && is_array($this->watch[$hook]) && sizeof($this->watch[$hook]) > 0;
     }
 
     /**
@@ -43,7 +43,7 @@ class Hook
         }
 
         // If hook has listeners, run them
-        if ($this->hookHasListeners($hook)) {
+        if ($this->hasListeners($hook)) {
             return $this->run($hook, $params, $callbackObject, $htmlContent);
         }
 
@@ -68,7 +68,7 @@ class Hook
      * @param $priority
      * @param $function
      */
-    public function listen(string $hook, $function, $priority = null)
+    public function listen(string $hook, callable $function, int $priority = 0)
     {
         $caller = debug_backtrace(null, 3)[2];
 
@@ -76,15 +76,20 @@ class Hook
             $caller = debug_backtrace(null, 4)[3];
         }
 
+        // Does hook exist? make array
         if (empty($this->watch[$hook])) {
             $this->watch[$hook] = [];
         }
 
-        if (!is_numeric($priority)) {
-            $priority = null;
+        // Does priory exist in hook? make array
+        if (empty($this->watch[$hook][$priority])) {
+            $this->watch[$hook][$priority] = [];
         }
 
-        $this->watch[$hook][$priority] = [
+        // Nest final hook in priorty so that as many hooks as wanted can be set with the same
+        // priorty level. Hooks at the same priorty will run in the order they are added.
+        // getListeners method will flatten array to correct order when called
+        $this->watch[$hook][$priority][] = [
             'function' => $function,
             'caller'   => [
                 //'file' => $caller['file'],
@@ -186,9 +191,9 @@ class Hook
         array_unshift($params, $output);
         array_unshift($params, $callback);
 
-        if ($this->hookHasListeners($hook))
+        if ($this->hasListeners($hook))
         {
-            foreach ($this->watch[$hook] as $function) {
+            foreach ($this->getListeners($hook) as $function) {
                 if (!empty($this->stop[$hook])) {
                     unset($this->stop[$hook]);
                     break;
@@ -211,8 +216,9 @@ class Hook
     public function getListeners(string $hook = null)
     {
         if (is_null($hook)) {
-            return $this->watch;
+            return array_map(function($hooks){ return array_merge(...$hooks); }, $this->watch);
         }
-        return empty($this->watch[$hook]) ? null : $this->watch[$hook];
+
+        return empty($this->watch[$hook]) ? null : array_merge(...$this->watch[$hook]);
     }
 }

@@ -27,7 +27,7 @@ Example 3: You save the users' data in a database. If you do it in a hook, you c
 # How do I install it?
 
 ```bash
-composer require coinvestor/lara-hook
+composer require coinvestor/larahook
 ```
 
 then to the app.php :
