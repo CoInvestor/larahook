@@ -43,8 +43,7 @@ class Hook
         }
 
         // If hook has listeners, run them
-        if ($this->hookHasListeners($hook)){
-            unset($callbackObject);
+        if ($this->hookHasListeners($hook)) {
             return $this->run($hook, $params, $callbackObject, $htmlContent);
         }
 
