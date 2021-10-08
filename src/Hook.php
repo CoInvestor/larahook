@@ -12,6 +12,18 @@ class Hook
     protected $testing = false;
 
     /**
+     * hookHasListeners
+     * Check if a given hook has any listeners configured.
+     * 
+     * @param  string $hook
+     * @return boolean
+     */
+    public function hookHasListeners(string $hook): boolean
+    {
+        return array_key_exists($hook, $this->watch)) && is_array($this->watch[$hook]) && sizeof($this->watch[$hook]) > 0;
+    }
+
+    /**
      * Return the hook answer.
      *
      * @param string   $hook        Hook name
@@ -30,15 +42,14 @@ class Hook
             return $output;
         }
 
-        $output = $this->run($hook, $params, $callbackObject, $htmlContent);
-
-        if (!$output) {
-            $output = $callbackObject->call();
+        // If hook has listeners, run them
+        if ($this->hookHasListeners($hook)){
+            unset($callbackObject);
+            return $this->run($hook, $params, $callbackObject, $htmlContent);
         }
 
-        unset($callbackObject);
-
-        return $output;
+        // No listerns, invoke default result
+        return $callbackObject->call();
     }
 
     /**
@@ -176,17 +187,16 @@ class Hook
         array_unshift($params, $output);
         array_unshift($params, $callback);
 
-        if (array_key_exists($hook, $this->watch)) {
-            if (is_array($this->watch[$hook])) {
-                foreach ($this->watch[$hook] as $function) {
-                    if (!empty($this->stop[$hook])) {
-                        unset($this->stop[$hook]);
-                        break;
-                    }
-
-                    $output = call_user_func_array($function['function'], $params);
-                    $params[1] = $output;
+        if ($this->hookHasListeners($hook))
+        {
+            foreach ($this->watch[$hook] as $function) {
+                if (!empty($this->stop[$hook])) {
+                    unset($this->stop[$hook]);
+                    break;
                 }
+
+                $output = call_user_func_array($function['function'], $params);
+                $params[1] = $output;
             }
         }
 
