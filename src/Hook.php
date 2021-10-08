@@ -1,6 +1,6 @@
 <?php
 
-namespace Esemve\Hook;
+namespace CoInvestor\LaraHook;
 
 use Illuminate\Support\Arr;
 
@@ -33,7 +33,7 @@ class Hook
      *
      * @return null|void
      */
-    public function get($hook, $params = [], callable $callback = null, $htmlContent = '')
+    public function get(string $hook, $params = [], callable $callback = null, $htmlContent = '')
     {
         $callbackObject = $this->createCallbackObject($callback, $params);
 
@@ -56,7 +56,7 @@ class Hook
      *
      * @param string $hook Hook name
      */
-    public function stop($hook)
+    public function stop(string $hook)
     {
         $this->stop[$hook] = true;
     }
@@ -68,7 +68,7 @@ class Hook
      * @param $priority
      * @param $function
      */
-    public function listen($hook, $function, $priority = null)
+    public function listen(string $hook, $function, $priority = null)
     {
         $caller = debug_backtrace(null, 3)[2];
 
@@ -116,7 +116,7 @@ class Hook
      *
      * @return array
      */
-    public function getEvents($hook)
+    public function getEvents(string $hook)
     {
         $output = [];
 
@@ -130,13 +130,13 @@ class Hook
     /**
      * For testing.
      *
-     * @param string $name   Hook name
+     * @param string $hook   Hook name
      * @param mixed  $return Answer
      */
-    public function mock($name, $return)
+    public function mock(string $hook, $return)
     {
         $this->testing = true;
-        $this->mock[$name] = ['return' => $return];
+        $this->mock[$hook] = ['return' => $return];
     }
 
     /**
@@ -146,7 +146,7 @@ class Hook
      *
      * @return null|mixed
      */
-    protected function returnMockIfDebugModeAndMockExists($hook)
+    protected function returnMockIfDebugModeAndMockExists(string $hook)
     {
         if ($this->testing) {
             if (array_key_exists($hook, $this->mock)) {
@@ -164,7 +164,7 @@ class Hook
      * @param callable $callback function
      * @param array    $params   parameters
      *
-     * @return \Esemve\Hook\Callback
+     * @return \CoInvestor\LaraHook\Callback
      */
     protected function createCallbackObject($callback, $params)
     {
@@ -176,12 +176,12 @@ class Hook
      *
      * @param string                $hook     Hook name
      * @param array                 $params   Parameters
-     * @param \Esemve\Hook\Callback $callback Callback object
+     * @param \CoInvestor\LaraHook\Callback $callback Callback object
      * @param string                $output   html wrapped by hook
      *
      * @return mixed
      */
-    protected function run($hook, $params, Callback $callback, $output = null)
+    protected function run(string $hook, array $params, Callback $callback, $output = null)
     {
         array_unshift($params, $output);
         array_unshift($params, $callback);
@@ -205,14 +205,14 @@ class Hook
     /**
      * Return the listeners.
      *
-     * @param string $hookName If supplied, only listeners for the specified hook will be returned.
+     * @param string $hook If supplied, only listeners for the specified hook will be returned.
      * @return array
      */
-    public function getListeners($hookName = null)
+    public function getListeners(string $hook = null)
     {
-        if (is_null($hookName)) {
+        if (is_null($hook)) {
             return $this->watch;
         }
-        return empty($this->watch[$hookName]) ? null : $this->watch[$hookName];
+        return empty($this->watch[$hook]) ? null : $this->watch[$hook];
     }
 }

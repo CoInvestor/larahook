@@ -1,6 +1,6 @@
 <?php
 
-namespace Esemve\Hook;
+namespace CoInvestor\LaraHook;
 
 class Callback
 {

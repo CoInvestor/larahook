@@ -1,6 +1,6 @@
 <?php
 
-namespace Esemve\Hook\Facades;
+namespace CoInvestor\LaraHook\Facades;
 
 use Illuminate\Support\Facades\Facade;
 

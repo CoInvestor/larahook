@@ -1,6 +1,6 @@
 <?php
 
-namespace Esemve\Hook\Console;
+namespace CoInvestor\LaraHook\Console;
 
 use Hook;
 use Illuminate\Console\Command;

@@ -1,4 +1,8 @@
-# Hook engine for Laravel
+# Lara-Hook - A Hook engine for Laravel
+
+This is a maintained fork of the now inactive [esemve/Hook](https://github.com/esemve/Hook) library for laravel. We have now opted to maintain this library ourselves under the new name of lara-hook. The new version includes a number of enhancements as well as compatibility with Laravel 8.
+
+As of right now this can be used as a drop-in replacement for `esemve/Hook`.
 
 **What is this?**
 
@@ -23,7 +27,7 @@ Example 3: You save the users' data in a database. If you do it in a hook, you c
 # How do I install it?
 
 ```bash
-composer require esemve/hook
+composer require coinvestor/lara-hook
 ```
 
 then to the app.php :
@@ -31,12 +35,12 @@ then to the app.php :
 ...
 'providers' => [
     ...
-    Esemve\Hook\HookServiceProvider::class,
+    CoInvestor\LaraHook\HookServiceProvider::class,
     ...
  ],
  'aliases' =>[
     ...
-    'Hook' => Esemve\Hook\Facades\Hook::class
+    'Hook' => CoInvestor\LaraHook\Facades\Hook::class
     ...
  ]
 ```
