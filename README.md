@@ -1,18 +1,17 @@
-# Lara-Hook - A Hook engine for Laravel
+# LaraHook - A Hook engine for Laravel
 
-This is a maintained fork of the now inactive [esemve/Hook](https://github.com/esemve/Hook) library for laravel. We have now opted to maintain this library ourselves under the new name of lara-hook. The new version includes a number of enhancements as well as compatibility with Laravel 8.
+This is a maintained fork of the now inactive [esemve/Hook](https://github.com/esemve/Hook) library for laravel 8.   
+For most cases this can be used as a drop in replacement, please see [the differences section](# Differences between this and esemve/Hook) for more information on the changes between this library and `esemve/Hook`
 
-As of right now this can be used as a drop-in replacement for `esemve/Hook`.
+### What is this?
 
-**What is this?**
+Hooks allow programmers to make parts of their application open to being modified or adjusted from other locations within the code base. For example allowing an application modify the behavior of your package without them needing directly edit its source code.
 
-The purpose of this project is that your packages could modify each other without overriding the source code.
-
-**What is a Hook?**
+### What is a Hook?**
 
 It is similar to an event. A code bounded by a hook runs unless a hook listener catches it and orders that instead of the function in the hook, something else should run. They could be set in an established order, so you are able to make several modifications in the code.
 
-**What is it good for?**
+### What is it good for?
 
 Example 1: You have a module which displays an editor. This remains the same editor in every case.
 If you bound the display of the editor in a hook, then you can write a module which can redefine/override this hook, and for example changs the textarea to a ckeditor.
@@ -52,7 +51,7 @@ Example:
 
 ```php
 $user = new User();
-$user = Hook::get('fillUser',[$user],function($user){
+$user = Hook::get('fillUser', [$user], function($user) {
     return $user;
 });
 ```
@@ -79,7 +78,6 @@ THen come the parameters delivered by the hook, in this case the user.
 The hook listener above caught the call of the fillUser, extended the received object, and returned it to its original place. After the run of the hook the $user object contains a profilImage variable as well.
 
 Number 10 in the example is the priority. They are executed in an order, so if a number 5 is registered to the fillUser as well, it will run before number 10.
-
 
 # Initial output
 
@@ -136,13 +134,11 @@ Hook::listen('template.hookName', function ($callback, $output, $variables) {
 });
 ```
 
-
 # Stop
 ```php
 Hook::stop();
 ```
 Put in a hook listener it stops the running of the other listeners that are registered to this hook.
-
 
 
 # For testing
@@ -159,6 +155,13 @@ php artisan hook::list
 ```
 
 Lists all the active hook listeners.
+
+# Differences between this and esemve/Hook
+
+* Compatibility with laravel 8+
+* It is now possible to return falsey values from listeners.
+* Multiple listeners can now be set at the same priority level without overwriting one another.
+* getListeners can now return listeners for a specified hook.
 
 ---
 
