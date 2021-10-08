@@ -1,13 +1,14 @@
 # LaraHook - A Hook engine for Laravel
 
 This is a maintained fork of the now inactive [esemve/Hook](https://github.com/esemve/Hook) library for laravel 8.   
-For most cases this can be used as a drop in replacement, please see [the differences section](# Differences between this and esemve/Hook) for more information on the changes between this library and `esemve/Hook`
+
+In most cases this library can be used as a drop in replacement, please see [the differences section](#differences-between-this-and-esemvehook) for more information on the changes between this library and `esemve/Hook`
 
 ### What is this?
 
 Hooks allow programmers to make parts of their application open to being modified or adjusted from other locations within the code base. For example allowing an application modify the behavior of your package without them needing directly edit its source code.
 
-### What is a Hook?**
+### What is a Hook?
 
 It is similar to an event. A code bounded by a hook runs unless a hook listener catches it and orders that instead of the function in the hook, something else should run. They could be set in an established order, so you are able to make several modifications in the code.
 
