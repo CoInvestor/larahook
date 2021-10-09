@@ -14,13 +14,15 @@ class Hook
     /**
      * hasListeners
      * Check if a given hook has any listeners configured.
-     * 
+     *
      * @param  string $hook
      * @return boolean
      */
     public function hasListeners(string $hook): bool
     {
-        return array_key_exists($hook, $this->watch) && is_array($this->watch[$hook]) && sizeof($this->watch[$hook]) > 0;
+        return array_key_exists($hook, $this->watch) &&
+                is_array($this->watch[$hook]) &&
+                sizeof($this->watch[$hook]) > 0;
     }
 
     /**
@@ -92,8 +94,8 @@ class Hook
         $this->watch[$hook][$priority][] = [
             'function' => $function,
             'caller'   => [
-                //'file' => $caller['file'],
-                //'line' => $caller['line'],
+                // 'file' => $caller['file'],
+                // 'line' => $caller['line'],
                 'class' => Arr::get($caller, 'class'),
             ],
         ];
@@ -191,8 +193,7 @@ class Hook
         array_unshift($params, $output);
         array_unshift($params, $callback);
 
-        if ($this->hasListeners($hook))
-        {
+        if ($this->hasListeners($hook)) {
             foreach ($this->getListeners($hook) as $function) {
                 if (!empty($this->stop[$hook])) {
                     unset($this->stop[$hook]);
@@ -216,7 +217,9 @@ class Hook
     public function getListeners(string $hook = null)
     {
         if (is_null($hook)) {
-            return array_map(function($hooks){ return array_merge(...$hooks); }, $this->watch);
+            return array_map(function ($hooks) {
+                return array_merge(...$hooks);
+            }, $this->watch);
         }
 
         return empty($this->watch[$hook]) ? null : array_merge(...$this->watch[$hook]);
