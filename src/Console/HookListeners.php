@@ -2,8 +2,8 @@
 
 namespace CoInvestor\LaraHook\Console;
 
-use Hook;
 use Illuminate\Console\Command;
+use CoInvestor\LaraHook\Facades\Hook;
 
 class HookListeners extends Command
 {
@@ -34,14 +34,14 @@ class HookListeners extends Command
         foreach ($list as $hook => $lister) {
             foreach ($lister as $key => $element) {
                 $array[] = [
-                    $key,
                     $hook,
+                    $key,
                     $element['caller']['class'],
                 ];
             }
         }
 
-        $headers = ['Sort', 'Hook name', 'Listener class'];
+        $headers = ['Hook name', 'Order', 'Listener class'];
 
         $this->table($headers, $array);
     }

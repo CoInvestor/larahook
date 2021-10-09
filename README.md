@@ -162,7 +162,9 @@ Lists all the active hook listeners.
 * Compatibility with laravel 8+
 * It is now possible to return falsey values from listeners.
 * Multiple listeners can now be set at the same priority level without overwriting one another.
-* getListeners can now return listeners for a specified hook.
+* `getListeners` can now return listeners for a specified hook. Results will always be an array.
+* Caller information now includes file & line numbers.
+* `removeListener` and `removeListeners` methods.
 
 ---
 

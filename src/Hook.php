@@ -44,10 +44,12 @@ class Hook
             return $output;
         }
 
-        // If hook has listeners, run them
-        if ($this->hasListeners($hook)) {
+        // If hook has listeners & isn't stopped, run them
+        if ($this->hasListeners($hook) && empty($this->stop[$hook])) {
             return $this->run($hook, $params, $callbackObject, $htmlContent);
         }
+
+        unset($this->stop[$hook]);
 
         // No listerns, invoke default result
         return $callbackObject->call();
@@ -72,12 +74,6 @@ class Hook
      */
     public function listen(string $hook, callable $function, int $priority = 0)
     {
-        $caller = debug_backtrace(null, 3)[2];
-
-        if (in_array(Arr::get($caller, 'function'), ['include', 'require'])) {
-            $caller = debug_backtrace(null, 4)[3];
-        }
-
         // Does hook exist? make array
         if (empty($this->watch[$hook])) {
             $this->watch[$hook] = [];
@@ -93,14 +89,29 @@ class Hook
         // getListeners method will flatten array to correct order when called
         $this->watch[$hook][$priority][] = [
             'function' => $function,
-            'caller'   => [
-                // 'file' => $caller['file'],
-                // 'line' => $caller['line'],
-                'class' => Arr::get($caller, 'class'),
-            ],
+            'caller'   => $this->detectCallerInformation(),
         ];
 
         ksort($this->watch[$hook]);
+    }
+
+    public function removeListeners(string $hook): bool
+    {
+        $this->watch[$hook] = [];
+        return true;
+    }
+
+    public function removeListener(string $hook, callable $function): bool
+    {
+        foreach ($this->watch[$hook] as $priority => $hooks) {
+            foreach ($hooks as $index => $h) {
+                if ($h['function'] === $function) {
+                    unset($this->watch[$hook][$priority][$index]);
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     /**
@@ -108,7 +119,7 @@ class Hook
      *
      * @return array
      */
-    public function getHooks()
+    public function getHooks(): array
     {
         $hookNames = (array_keys($this->watch));
         ksort($hookNames);
@@ -123,11 +134,11 @@ class Hook
      *
      * @return array
      */
-    public function getEvents(string $hook)
+    public function getEvents(string $hook): array
     {
         $output = [];
 
-        foreach ($this->watch[$hook] as $key => $value) {
+        foreach ($this->getListeners($hook) as $key => $value) {
             $output[$key] = $value['caller'];
         }
 
@@ -173,7 +184,7 @@ class Hook
      *
      * @return \CoInvestor\LaraHook\Callback
      */
-    protected function createCallbackObject($callback, $params)
+    protected function createCallbackObject(callable $callback, array $params): Callback
     {
         return new Callback($callback, $params);
     }
@@ -214,7 +225,7 @@ class Hook
      * @param string $hook If supplied, only listeners for the specified hook will be returned.
      * @return array
      */
-    public function getListeners(string $hook = null)
+    public function getListeners(string $hook = null): array
     {
         if (is_null($hook)) {
             return array_map(function ($hooks) {
@@ -222,6 +233,34 @@ class Hook
             }, $this->watch);
         }
 
-        return empty($this->watch[$hook]) ? null : array_merge(...$this->watch[$hook]);
+        return empty($this->watch[$hook]) ? [] : array_merge(...$this->watch[$hook]);
+    }
+
+    /**
+     * Detect caller information
+     * Determines file, class & line number that the given listener is defined on.
+     *
+     * @return array
+     */
+    private function detectCallerInformation(): array
+    {
+        // Use backtrace to determine where the current listener is defined.
+        $trace = debug_backtrace(null, 5);
+        // 0 is this method, and 1 is this libraries hook.
+        $depth = 2;
+
+        // if 2 is an include, or require, get method details from depth 3.
+        if (in_array(Arr::get($trace[$depth], 'function'), ['include', 'require'])) {
+            $depth++;
+        }
+
+        // Use $depth+1 to get function/class names, while depth gives us file/line of the
+        // hook facade itself being invoked.
+        return [
+                'file' => $trace[$depth]['file'],
+                'line' => $trace[$depth]['line'],
+                'function' => $trace[$depth + 1]['function'],
+                'class' => Arr::get($trace[$depth + 1], 'class'),
+        ];
     }
 }
