@@ -63,7 +63,7 @@ In this case a fillUser hook is thrown, which receive the $user object as a para
 Hook::listen('fillUser', function ($callback, $output, $user) {
     if (empty($output))
     {
-      $output = $user;
+        $output = $user;
     }
     $output->profilImage = ProfilImage::getForUser($user->id);
     return $output;
@@ -85,19 +85,19 @@ Number 10 in the example is the priority. They are executed in an order, so if a
 You can pass initial output to the listeners too.
 
 ```php
-$initialOutput='test string';
+$initialOutput = 'test string';
 
-\Hook::get('testing',['other string'],function($otherString){
+Hook::get('testing', ['other string'], function ($otherString) {
     return $otherString;
 },$initialOutput)
 
 // and later ...
 
 Hook::listen('testing', function ($callback, $output, $otherString) {
-    if ($output==='test string') {
-        $output="{$output} yeeeaaaayyy!";
+    if ($output === 'test string') {
+        $output = "{$output} yeeeaaaayyy!";
     }
-    if ($otherString==='other_string') {
+    if ($otherString === 'other_string') {
         // other string is good too
     }
     return $output; // 'test string yeeeaaaayyy!'
@@ -114,7 +114,7 @@ If there is no listeners, 'other string' will be returned.
 In this case the hook listener can catch it like this:
 ```php
  Hook::listen('template.hookName', function ($callback, $output, $variables) {
-   return view('test.button');
+     return view('test.button');
  });
 ```
 In the $variables variable it receives all of the variables that are available for the blade template.
@@ -131,7 +131,7 @@ In the $variables variable it receives all of the variables that are available f
 Now the `$output` parameter contains html wrapped by hook component.
 ```php
 Hook::listen('template.hookName', function ($callback, $output, $variables) {
-  return "<div class=\"alert alert-success\">$output</div>";
+    return "<div class=\"alert alert-success\">$output</div>";
 });
 ```
 
