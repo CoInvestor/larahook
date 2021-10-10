@@ -211,7 +211,11 @@ class Hook
                     break;
                 }
 
-                $output = call_user_func_array($function['function'], $params);
+                // array_values is used to ensure the args are passed poistionally. In php8
+                // named params will be treated as named params, beaking backwards compabaility.
+                // We may in the future want to do something clever re: detecting if this behavior
+                // is wanted or not.
+                $output = call_user_func_array($function['function'], array_values($params));
                 $params[1] = $output;
             }
         }

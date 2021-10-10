@@ -42,7 +42,6 @@ class HookListeners extends Command
         }
 
         $headers = ['Hook name', 'Order', 'Listener class'];
-
         $this->table($headers, $array);
     }
 }
