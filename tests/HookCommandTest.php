@@ -5,7 +5,7 @@ namespace CoInvestor\LaraHook\Test;
 use Orchestra\Testbench\TestCase;
 use CoInvestor\LaraHook\Facades\Hook;
 
-class HookCommandTests extends TestCase
+class HookCommandTest extends TestCase
 {
     /**
      * Setup Hook service
@@ -39,10 +39,10 @@ class HookCommandTests extends TestCase
                 'Hook name', 'Order', 'Listener class'
              ],
              [
-                [ 'test', '0', 'CoInvestor\LaraHook\Test\HookCommandTests'],
-                [ 'test2', '0', 'CoInvestor\LaraHook\Test\HookCommandTests'],
-                [ 'test2', '1', 'CoInvestor\LaraHook\Test\HookCommandTests'],
-                [ 'test3', '0', 'CoInvestor\LaraHook\Test\HookCommandTests'],
+                [ 'test', '0', 'CoInvestor\LaraHook\Test\HookCommandTest'],
+                [ 'test2', '0', 'CoInvestor\LaraHook\Test\HookCommandTest'],
+                [ 'test2', '1', 'CoInvestor\LaraHook\Test\HookCommandTest'],
+                [ 'test3', '0', 'CoInvestor\LaraHook\Test\HookCommandTest'],
              ]
          )
         ->assertExitCode(0);

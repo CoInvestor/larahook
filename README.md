@@ -2,7 +2,7 @@
 
 This is a maintained fork of the now inactive [esemve/Hook](https://github.com/esemve/Hook) library for laravel 8.   
 
-In most cases this library can be used as a drop in replacement, please see [the differences section](#differences-between-this-and-esemvehook) for more information on the changes between this library and `esemve/Hook`
+In most cases this library can be used as a drop in replacement, although some changes may require minor updates to your code. Please see [the differences section](#differences-between-this-and-esemvehook) for more information on the changes between this library and `esemve/Hook`
 
 ### What is this?
 
@@ -45,27 +45,22 @@ then to the app.php :
  ]
 ```
 
-
 # How does it work?
 
-Example:
+## Example code
 
 ```php
 $user = new User();
 $user = Hook::get('fillUser', [$user], function($user) {
     return $user;
-});
+}, true);
 ```
 
 In this case a fillUser hook is thrown, which receive the $user object as a parameter. If nothing catches it, the internal function, the return $user will run, so nothing happens. But it can be caught by a listener from a provider:
 
 ```php
 Hook::listen('fillUser', function ($callback, $output, $user) {
-    if (empty($output))
-    {
-        $output = $user;
-    }
-    $output->profilImage = ProfilImage::getForUser($user->id);
+    $output->profileImage = ProfileImage::getForUser($user->id);
     return $output;
 }, 10);
 
@@ -76,36 +71,65 @@ Multiple listeners could be registered to a hook, so in the $output the listener
 
 THen come the parameters delivered by the hook, in this case the user.
 
-The hook listener above caught the call of the fillUser, extended the received object, and returned it to its original place. After the run of the hook the $user object contains a profilImage variable as well.
+The hook listener above caught the call of the fillUser, extended the received object, and returned it to its original place. After the run of the hook the $user object contains a profileImage variable as well.
 
 Number 10 in the example is the priority. They are executed in an order, so if a number 5 is registered to the fillUser as well, it will run before number 10.
 
-# Initial output
+## Methods
 
-You can pass initial output to the listeners too.
+### Get
+Run a hook and return some data. Listeners for the hook will be triggered and the final result from these will be returned.
+```php
+Hook::get(
+    string $hook,                    // Name of the hook to run
+    array $params,                   // Array of values to be passed to the listeners on this hook.
+    callable $callback,              // Callback method to return default value if no listeners are registered.
+    bool $useCallbackAsFirstListener // Should the default callback be run and used as the first $output value
+                                     // for the listeners. Defaults to false.
+);
+```
+
+### Listen
+Listen for the hook and either carry out an action or manipulated the output before it is returned.
+```php
+Hook::listen(
+    string $hook,            // Name of the hook to listen on.
+    callable $method (       // Callback to execute when hook is run. 
+        callable $callback,  // Default callback from the `get`. Called as `$callback->call` 
+        mixed $output,       // Output from previous hook. Will be null unless useCallbackAsFirstListener
+                             // is set to true, in which case it will be the default callbacks value.
+        mixed $arg1,         // Each value provided to the `get` methods params array, is added to the
+        mixed $arg2,         // callbacks arguments in the order they were added.
+    )
+    int $priority            // Used the control when each listener runs. The higher this value, the later it will run in the list of listeners on the hook.
+);
+```
+
+## Initial output
+
+By passing `true` as the 4th paramater to the get you can ensure the default callback
+provided will always run, passing its self as the initial output value.
 
 ```php
-$initialOutput = 'test string';
-
-Hook::get('testing', ['other string'], function ($otherString) {
-    return $otherString;
-},$initialOutput)
+Hook::get('testing', ['Delilah'], function ($testString) {
+    return 'Hi ' . $testString;
+}, true)
 
 // and later ...
 
-Hook::listen('testing', function ($callback, $output, $otherString) {
-    if ($output === 'test string') {
-        $output = "{$output} yeeeaaaayyy!";
+Hook::listen('testing', function ($callback, $output, $name) {
+    if ($output === 'Hi Delilah') {
+        $output = "{$output}. Whats up!";
+    } else {
+        $output = "{$output}. Welcome back.";
     }
-    if ($otherString === 'other_string') {
-        // other string is good too
-    }
-    return $output; // 'test string yeeeaaaayyy!'
+    return $output; // 'Hi Delilah. Whats up!'
 });
 ```
-If there is no listeners, 'other string' will be returned.
 
-# Usage in blade templates
+If there is no listeners, 'Hi Delilah' will be returned.
+
+## Usage in blade templates
 
 ```php
 @hook('hookName')
@@ -121,7 +145,7 @@ In the $variables variable it receives all of the variables that are available f
 
 :exclamation: **To listen blade templates you need to listen `template.hookName` instead of just `hookName`!**
 
-# Wrap HTML
+## Wrap HTML
 ```php
 @hook('hookName', true)
     this content can be modified with dom parsers
@@ -135,14 +159,14 @@ Hook::listen('template.hookName', function ($callback, $output, $variables) {
 });
 ```
 
-# Stop
+## Stop
 ```php
 Hook::stop();
 ```
 Put in a hook listener it stops the running of the other listeners that are registered to this hook.
 
 
-# For testing
+## For testing
 
 ```php
 Hook::mock('hookName','returnValue');
@@ -157,15 +181,16 @@ php artisan hook::list
 
 Lists all the active hook listeners.
 
-# Differences between this and esemve/Hook
+# Differences between this and `esemve/Hook`
 
+* The InitialContent on `get` has been replaced by the ``useCallbackAsFirstListener` flag. Setting this will return the result of the default callback as the initial `$option` value.
+* Listeners on the same hook at the same priority will no longer overwrite each other. Listerners at the same priority will run in the order you register them. 
+* Returning a falsey value from a listeners will now return that value directly, rather than causing the default callback to be returned instead.
 * Compatibility with laravel 8+
-* It is now possible to return falsey values from listeners.
-* Multiple listeners can now be set at the same priority level without overwriting one another.
 * `getListeners` can now return listeners for a specified hook. Results will always be an array.
 * Caller information now includes file & line numbers.
-* `removeListener` and `removeListeners` methods.
+* Added `removeListener` and `removeListeners` methods.
+
 
 ---
-
 License: MIT
