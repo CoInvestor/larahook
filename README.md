@@ -183,10 +183,10 @@ Lists all the active hook listeners.
 
 # Differences between this and `esemve/Hook`
 
-* The InitialContent on `get` has been replaced by the ``useCallbackAsFirstListener` flag. Setting this will return the result of the default callback as the initial `$option` value.
+* The `$InitialContent` param on `Hook::get` has been replaced by the `useCallbackAsFirstListener` flag. Setting this to `true` will return the result of the default callback as the initial `$output` value.
 * Listeners on the same hook at the same priority will no longer overwrite each other. Listerners at the same priority will run in the order you register them. 
 * Returning a falsey value from a listeners will now return that value directly, rather than causing the default callback to be returned instead.
-* Compatibility with laravel 8+
+* Compatibility with laravel 8+.
 * `getListeners` can now return listeners for a specified hook. Results will always be an array.
 * Caller information now includes file & line numbers.
 * Added `removeListener` and `removeListeners` methods.
