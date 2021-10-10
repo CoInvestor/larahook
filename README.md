@@ -165,7 +165,8 @@ Lists all the active hook listeners.
 * `getListeners` can now return listeners for a specified hook. Results will always be an array.
 * Caller information now includes file & line numbers.
 * `removeListener` and `removeListeners` methods.
+* Blade hooks now use `$callback->call()` to get initial/wrapped content to bring them in linewith other hooks.
+
 
 ---
-
 License: MIT

@@ -21,17 +21,67 @@ class HookBladeTest extends TestCase
         return ['CoInvestor\LaraHook\HookServiceProvider'];
     }
 
-    public function testWrappedHook()
+    public function testWrappedBladeHook()
     {
-        $view = $this->blade('Hi @hook(\'test\', true){{$name}}@endhook', ['name' => 'Bob']);
-       // dd($view);
+        $view = $this->blade('<p>Hi @hook(\'test\', true){{$name}}@endhook</p>', ['name' => 'Bob>']);
         $view->assertSee('Hi Bob');
 
         Hook::listen('template.test', function ($callback, $output, $variables) {
-          return $this->blade('<strong>{{ $name }}</strong>', $variables);
+            return $this->blade('<strong>{{ $name }}</strong>', $variables);
         });
 
-        $view = $this->blade('Hi @hook(\'test\', true){{ $name }}@endhook', ['name' => 'Bob']);
-        $view->assertSee('Hi <strong>Bob</strong>');
+        $view = $this->blade('<p>Hi @hook(\'test\', true){{ $name }}@endhook</p>', ['name' => 'Bob>']);
+        $view->assertSee('<p>Hi <strong>Bob&gt;</strong></p>', false);
+
+        Hook::listen('template.test', function ($callback, $output, $variables) {
+            return "Battlemaster $output";
+        });
+
+        $view = $this->blade('<p>Hi @hook(\'test\', true){{ $name }}@endhook</p>', ['name' => 'Bob>']);
+        $view->assertSee('<p>Hi Battlemaster <strong>Bob&gt;</strong></p>', false);
+    }
+
+    public function testSingleBladeHook()
+    {
+        $view = $this->blade('<p>Hi @hook(\'test\')</p>', ['name' => 'Sally']);
+        $view->assertSee('<p>Hi </p>', false);
+
+        Hook::listen('template.test', function ($callback, $output, $variables) {
+            return $this->blade('{{ $name }}', $variables);
+        });
+
+        Hook::listen('template.test', function ($callback, $output, $variables) {
+            return "Battlemaster $output";
+        });
+
+        $view = $this->blade('<p>Hi @hook(\'test\')</p>', ['name' => 'Sally']);
+        $view->assertSee('<p>Hi Battlemaster Sally</p>', false);
+    }
+
+    public function testWrappedBladeHookManipulateInner()
+    {
+        $view = $this->blade('@hook(\'test\', true)This is some text.@endhook');
+        $view->assertSee('This is some text.');
+
+        Hook::listen('template.test', function ($callback, $output, $variables) {
+            return $callback->call();
+        });
+
+        $view = $this->blade('@hook(\'test\', true)This is some text.@endhook');
+        $view->assertSee('This is some text.');
+
+        Hook::listen('template.test', function ($callback, $output, $variables) {
+            return str_replace('text', 'great text', $output);
+        });
+
+        $view = $this->blade('@hook(\'test\', true)This is some text.@endhook');
+        $view->assertSee('This is some great text.');
+
+        Hook::listen('template.test', function ($callback, $output, $variables) {
+            return $output . "<div>Additional Element</div>";
+        });
+
+         $view = $this->blade('@hook(\'test\', true)This is some text.@endhook');
+        $view->assertSee('This is some great text.<div>Additional Element</div>', false);
     }
 }

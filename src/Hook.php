@@ -31,11 +31,10 @@ class Hook
      * @param string   $hook        Hook name
      * @param array    $params
      * @param callable $callback
-     * @param string   $htmlContent content wrapped by hook
      *
      * @return null|void
      */
-    public function get(string $hook, $params = [], callable $callback = null, $htmlContent = '')
+    public function get(string $hook, $params = [], callable $callback = null)
     {
         $callbackObject = $this->createCallbackObject($callback, $params);
 
@@ -46,7 +45,7 @@ class Hook
 
         // If hook has listeners & isn't stopped, run them
         if ($this->hasListeners($hook) && empty($this->stop[$hook])) {
-            return $this->run($hook, $params, $callbackObject, $htmlContent);
+            return $this->run($hook, $params, $callbackObject);
         }
 
         unset($this->stop[$hook]);
@@ -195,13 +194,12 @@ class Hook
      * @param string                $hook     Hook name
      * @param array                 $params   Parameters
      * @param \CoInvestor\LaraHook\Callback $callback Callback object
-     * @param string                $output   html wrapped by hook
      *
      * @return mixed
      */
-    protected function run(string $hook, array $params, Callback $callback, $output = null)
+    protected function run(string $hook, array $params, Callback $callback)
     {
-        array_unshift($params, $output);
+        array_unshift($params, null); // Initial result is null
         array_unshift($params, $callback);
 
         if ($this->hasListeners($hook)) {
