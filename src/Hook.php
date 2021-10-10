@@ -35,8 +35,12 @@ class Hook
      *
      * @return null|void
      */
-    public function get(string $hook, array $params = [], callable $callback = null, bool $useCallbackAsFirstListener = false)
-    {
+    public function get(
+        string $hook,
+        array $params = [],
+        callable $callback = null,
+        bool $useCallbackAsFirstListener = false
+    ) {
         $callbackObject = $this->createCallbackObject($callback, $params);
 
         $output = $this->returnMockIfDebugModeAndMockExists($hook);
