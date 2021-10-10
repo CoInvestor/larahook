@@ -47,37 +47,7 @@ then to the app.php :
 
 # How does it work?
 
-## Methods
-
-### Get
-Run a hook and return some data. Listeners for the hook will be triggered and the final result from these will be returned.
-```
-Hook::get(
-    string $hook,                    // Name of the hook to run
-    array $params,                   // Array of values to be passed to the listeners on this hook.
-    callable $callback,              // Callback method to return default value if no listeners are registered
-    bool $useCallbackAsFirstListener // Should the default callback be run and used as the first $output value for the listeners. Defaults to false.
-);
-```
-
-### listen
-Listen for the hook and either carry out an action or manipulated the output before it is returned.
-```
-Hook::listen(
-    $hook,            // Name of the hook to listen on.
-    function          // Callback to execute when hook is run.
-    (
-        $callback,    // Default callback from the `get`. Called as `$callback->call` 
-        $output,      // Output from previous hook. Will be null unless useCallbackAsFirstListener is set to true, in which case it will be the default callbacks value
-        $arg1,        // Args as passed in to the `get` methods params.
-        $arg2,
-        ...
-    )
-    $priority         // Used the control when each listener runs. The higher this value, the later it will run in the list of listeners on the hook.
-);
-```
-
-## Simple example
+## Example code
 
 ```php
 $user = new User();
@@ -104,6 +74,36 @@ THen come the parameters delivered by the hook, in this case the user.
 The hook listener above caught the call of the fillUser, extended the received object, and returned it to its original place. After the run of the hook the $user object contains a profileImage variable as well.
 
 Number 10 in the example is the priority. They are executed in an order, so if a number 5 is registered to the fillUser as well, it will run before number 10.
+
+## Methods
+
+### Get
+Run a hook and return some data. Listeners for the hook will be triggered and the final result from these will be returned.
+```php
+Hook::get(
+    string $hook,                    // Name of the hook to run
+    array $params,                   // Array of values to be passed to the listeners on this hook.
+    callable $callback,              // Callback method to return default value if no listeners are registered.
+    bool $useCallbackAsFirstListener // Should the default callback be run and used as the first $output value
+                                     // for the listeners. Defaults to false.
+);
+```
+
+### Listen
+Listen for the hook and either carry out an action or manipulated the output before it is returned.
+```php
+Hook::listen(
+    string $hook,            // Name of the hook to listen on.
+    callable $method (       // Callback to execute when hook is run. 
+        callable $callback,  // Default callback from the `get`. Called as `$callback->call` 
+        mixed $output,       // Output from previous hook. Will be null unless useCallbackAsFirstListener
+                             // is set to true, in which case it will be the default callbacks value.
+        mixed $arg1,         // Each value provided to the `get` methods params array, is added to the
+        mixed $arg2,         // callbacks arguments in the order they were added.
+    )
+    int $priority            // Used the control when each listener runs. The higher this value, the later it will run in the list of listeners on the hook.
+);
+```
 
 ## Initial output
 
