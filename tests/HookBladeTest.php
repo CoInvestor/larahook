@@ -64,13 +64,6 @@ class HookBladeTest extends TestCase
         $view->assertSee('This is some text.');
 
         Hook::listen('template.test', function ($callback, $output, $variables) {
-            return $callback->call();
-        });
-
-        $view = $this->blade('@hook(\'test\', true)This is some text.@endhook');
-        $view->assertSee('This is some text.');
-
-        Hook::listen('template.test', function ($callback, $output, $variables) {
             return str_replace('text', 'great text', $output);
         });
 

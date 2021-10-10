@@ -28,13 +28,14 @@ class Hook
     /**
      * Return the hook answer.
      *
-     * @param string   $hook        Hook name
-     * @param array    $params
-     * @param callable $callback
+     * @param string   $hook        - Hook name
+     * @param array    $params      - Hook arguments
+     * @param callable $callback    - Default value callback
+     * @param bool     $useCallbackAsFirstListener - Run default value callback to use as first $output value
      *
      * @return null|void
      */
-    public function get(string $hook, $params = [], callable $callback = null)
+    public function get(string $hook, array $params = [], callable $callback = null, bool $useCallbackAsFirstListener = false)
     {
         $callbackObject = $this->createCallbackObject($callback, $params);
 
@@ -45,12 +46,12 @@ class Hook
 
         // If hook has listeners & isn't stopped, run them
         if ($this->hasListeners($hook) && empty($this->stop[$hook])) {
-            return $this->run($hook, $params, $callbackObject);
+            return $this->run($hook, $params, $callbackObject, $useCallbackAsFirstListener);
         }
 
         unset($this->stop[$hook]);
 
-        // No listerns, invoke default result
+        // No listeners, invoke default result
         return $callbackObject->call();
     }
 
@@ -191,15 +192,20 @@ class Hook
     /**
      * Run hook events.
      *
-     * @param string                $hook     Hook name
-     * @param array                 $params   Parameters
-     * @param \CoInvestor\LaraHook\Callback $callback Callback object
+     * @param string    $hook           Hook name
+     * @param array     $params         Parameters
+     * @param Callback  $callback       Callback object
+     * @param bool      $useCallbackAsFirstListener -
      *
      * @return mixed
      */
-    protected function run(string $hook, array $params, Callback $callback)
+    protected function run(string $hook, array $params, Callback $callback, bool $useCallbackAsFirstListener)
     {
-        array_unshift($params, null); // Initial result is null
+        // If useCallbackAsFirstListener is set, he $output value passed to the first
+        // listener will be the result of the default callback.
+        // If false, this will be null (replicating original behavior where the default
+        // callback is not executed when a listener is set)
+        array_unshift($params, $useCallbackAsFirstListener ? $callback->call() : null);
         array_unshift($params, $callback);
 
         if ($this->hasListeners($hook)) {
@@ -209,8 +215,11 @@ class Hook
                     break;
                 }
 
-                // array_values is used to ensure the args are passed poistionally. In php8
-                // named params will be treated as named params, beaking backwards compabaility.
+                // array_values is used to ensure the args are passed by position. In php8
+                // call_user_func_array will default to passing args as named values if the
+                // array passed is associative. This breaks the existing functionality where
+                // by the listener can name its arguments whatever it pleases.
+                //
                 // We may in the future want to do something clever re: detecting if this behavior
                 // is wanted or not.
                 $output = call_user_func_array($function['function'], array_values($params));

@@ -60,6 +60,30 @@ class HookTests extends TestCase
     }
 
     /**
+     * Check listener is passed default value from callback
+     * when hook get is passed true.
+     *
+     * @return void
+     */
+    public function testGetListenersRunWithDefaultOn()
+    {
+        Hook::listen("test_name", function ($callback, $output, $arg1, $arg2) {
+            return $output . "hooked";
+        }, 1);
+
+        $result = Hook::get(
+            "test_name",
+            ['arg1', 'arg2'],
+            function ($arg1, $arg2) {
+                return $arg1 . $arg2;
+            },
+            true
+        );
+
+        $this->assertEquals('arg1arg2hooked', $result);
+    }
+
+    /**
      * Confirm listeners can return falsey values
      * @return void
      */

@@ -74,7 +74,8 @@ class HookServiceProvider extends ServiceProvider
                 $output = Hook::get(
                     "template.$__hook_name",
                     ["data"=>$__definedVars],
-                    function($data) use ($__hook_content) { return $__hook_content; }
+                    function($data) use ($__hook_content) { return $__hook_content; },
+                    true
                 );
 
                 unset($__hook_name);
