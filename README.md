@@ -30,21 +30,6 @@ Example 3: You save the users' data in a database. If you do it in a hook, you c
 composer require coinvestor/larahook
 ```
 
-then to the app.php :
-```php
-...
-'providers' => [
-    ...
-    CoInvestor\LaraHook\HookServiceProvider::class,
-    ...
- ],
- 'aliases' =>[
-    ...
-    'Hook' => CoInvestor\LaraHook\Facades\Hook::class
-    ...
- ]
-```
-
 # How does it work?
 
 ## Example code
