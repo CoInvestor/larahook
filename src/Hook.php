@@ -43,9 +43,9 @@ class Hook
     ) {
         $callbackObject = $this->createCallbackObject($callback, $params);
 
-        $output = $this->returnMockIfDebugModeAndMockExists($hook);
-        if ($output) {
-            return $output;
+        // Is a mock configured?
+        if ($this->isHookMocked($hook)) {
+            return $this->mock[$hook]['return'];
         }
 
         // If hook has listeners & isn't stopped, run them
@@ -162,22 +162,15 @@ class Hook
     }
 
     /**
-     * Return the mock value.
+     * is a mock configured for this hook
      *
      * @param string $hook Hook name
      *
-     * @return null|mixed
+     * @return bool
      */
-    protected function returnMockIfDebugModeAndMockExists(string $hook)
+    protected function isHookMocked(string $hook): bool
     {
-        if ($this->testing) {
-            if (array_key_exists($hook, $this->mock)) {
-                $output = $this->mock[$hook]['return'];
-                unset($this->mock[$hook]);
-
-                return $output;
-            }
-        }
+        return $this->testing && array_key_exists($hook, $this->mock);
     }
 
     /**
