@@ -297,6 +297,18 @@ class HookTests extends TestCase
         );
 
         $this->assertEquals($result, 'mockvalue2');
+
+        Hook::mock('test_name', false);
+
+        $result = Hook::get(
+            "test_name",
+            [],
+            function () {
+                return "default";
+            }
+        );
+
+        $this->assertFalse($result, false);
     }
 
     /**
