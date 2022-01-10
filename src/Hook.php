@@ -181,8 +181,14 @@ class Hook
      *
      * @return \CoInvestor\LaraHook\Callback
      */
-    protected function createCallbackObject(callable $callback, array $params): Callback
+    protected function createCallbackObject(callable $callback = null, array $params = []): Callback
     {
+        // Create void callback object if none set.
+        if (!$callback) {
+            $callback = function () {
+            };
+        }
+
         return new Callback($callback, $params);
     }
 
@@ -253,7 +259,7 @@ class Hook
     private function detectCallerInformation(): array
     {
         // Use backtrace to determine where the current listener is defined.
-        $trace = debug_backtrace(null, 5);
+        $trace = debug_backtrace(0, 5);
         // 0 is this method, and 1 is this libraries hook.
         $depth = 2;
 
