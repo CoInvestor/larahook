@@ -38,7 +38,7 @@ class HookTests extends TestCase
 
     /**
      * Ensure hook can be registered with no default value.
-     * 
+     *
      * @group noVal
      * @return void
      */

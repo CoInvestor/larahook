@@ -185,7 +185,8 @@ class Hook
     {
         // Create void callback object if none set.
         if (!$callback) {
-            $callback = function() {};
+            $callback = function () {
+            };
         }
 
         return new Callback($callback, $params);
