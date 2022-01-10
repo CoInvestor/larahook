@@ -37,6 +37,34 @@ class HookTests extends TestCase
     }
 
     /**
+     * Ensure hook can be registered with no default value.
+     * 
+     * @group noVal
+     * @return void
+     */
+    public function testGetNoDefaultValue()
+    {
+        $result = Hook::get(
+            "test_name",
+            ['arg1', 'arg2']
+        );
+
+        $this->assertEquals(null, $result);
+        $this->assertFalse(Hook::hasListeners('test_name'));
+
+        Hook::listen("test_name", function ($callback, $output, $arg1, $arg2) {
+            return "hooked" . $arg1 . $arg2 . $callback->call();
+        }, 1);
+
+        $result = Hook::get(
+            "test_name",
+            ['a', 'b']
+        );
+
+        $this->assertEquals('hookedab', $result);
+    }
+
+    /**
      * Confirm listener runs when hook is called
      * @return void
      */
