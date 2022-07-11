@@ -58,6 +58,21 @@ class HookBladeTest extends TestCase
         $view->assertSee('<p>Hi Battlemaster Sally</p>', false);
     }
 
+    public function testMultipleBladeHook()
+    {
+        Hook::listen('template.test', function ($callback, $output, $variables) {
+            return $this->blade('{{ $name }}', $variables);
+        });
+
+        Hook::listen('template.thing', function ($callback, $output, $variables) {
+            return $this->blade('science', $variables);
+        });
+
+
+        $view = $this->blade('<p>Hi @hook(\'test\') I like @hook(\'thing\')</p>', ['name' => 'Sally']);
+        $view->assertSee('<p>Hi Sally I like science</p>', false);
+    }
+
     public function testWrappedBladeHookManipulateInner()
     {
         $view = $this->blade('@hook(\'test\', true)This is some text.@endhook');

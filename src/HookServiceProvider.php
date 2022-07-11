@@ -36,15 +36,12 @@ class HookServiceProvider extends ServiceProvider
             // $parameters[1] => bool => is this wrapper component?
             if (!isset($parameters[1])) {
                 return '<?php
-
-                use CoInvestor\LaraHook\Facades\Hook;
-
                 $__definedVars = (get_defined_vars()["__data"]);
                 if (empty($__definedVars))
                 {
                     $__definedVars = [];
                 }
-                $output = Hook::get(
+                $output = \CoInvestor\LaraHook\Facades\Hook::get(
                     "template.' . $name . '",
                     ["data"=>$__definedVars],
                     function($data) { return null; }
@@ -62,8 +59,6 @@ class HookServiceProvider extends ServiceProvider
 
         Blade::directive('endhook', function ($parameter) {
             return '<?php
-                use CoInvestor\LaraHook\Facades\Hook;
-
                 $__definedVars = (get_defined_vars()["__data"]);
                 if (empty($__definedVars))
                 {
@@ -71,7 +66,7 @@ class HookServiceProvider extends ServiceProvider
                 }
                 $__hook_content = ob_get_clean();
 
-                $output = Hook::get(
+                $output = \CoInvestor\LaraHook\Facades\Hook::get(
                     "template.$__hook_name",
                     ["data"=>$__definedVars],
                     function($data) use ($__hook_content) { return $__hook_content; },
