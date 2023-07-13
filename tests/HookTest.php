@@ -400,4 +400,80 @@ class HookTests extends TestCase
             return 'default';
         }));
     }
+
+    /**
+     * Remove clear listeners
+     *
+     * @return void
+     */
+    public function testClearListeners()
+    {
+        $method = function ($callback, $output) {
+            return $output . "AAA";
+        };
+
+        Hook::listen("test", $method);
+        Hook::listen("test", function ($callback, $output) {
+            return $output . "BBB";
+        });
+
+        $this->assertEquals('AAABBB', Hook::get("test", [], function () {
+            return 'default';
+        }));
+
+        $this->assertTrue(Hook::clearListeners());
+
+        $this->assertEquals('default', Hook::get("test", [], function () {
+            return 'default';
+        }));
+    }
+
+    /**
+     * Remove clear listeners
+     *
+     * @return void
+     */
+    public function testReset()
+    {
+        $method = function ($callback, $output) {
+            return $output . "AAA";
+        };
+
+        // Listeners
+        Hook::listen("test", $method);
+        Hook::listen("test", function ($callback, $output) {
+            return $output . "BBB";
+        });
+
+        $this->assertEquals('AAABBB', Hook::get("test", [], function () {
+            return 'default';
+        }));
+
+        // Mock
+        Hook::mock('test_name', 'mockvalue');
+        $result = Hook::get(
+            "test_name",
+            [],
+            function () {
+                return "default";
+            }
+        );
+        $this->assertEquals($result, 'mockvalue');
+
+        // And clear
+        $this->assertTrue(Hook::reset());
+
+        $this->assertEquals('default', Hook::get("test", [], function () {
+            return 'default';
+        }));
+
+        $result = Hook::get(
+            "test_name",
+            [],
+            function () {
+                return "default";
+            }
+        );
+        $this->assertEquals($result, 'default');
+    }
 }
