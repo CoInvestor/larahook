@@ -99,12 +99,49 @@ class Hook
         ksort($this->watch[$hook]);
     }
 
+    /**
+     * Remove all listeners on a particular hook
+     *
+     * @param  string $hook [description]
+     * @return bool       [description]
+     */
     public function removeListeners(string $hook): bool
     {
         $this->watch[$hook] = [];
         return true;
     }
 
+    /**
+     * Clear all existing listeners
+     * @return bool [description]
+     */
+    public function clearListeners(): bool
+    {
+        $this->watch = [];
+        return true;
+    }
+
+    /**
+     * Reset all hooks. Returns to default state with any hooks, mocks or stops removed.
+     *
+     * @return  bool
+     */
+    public function reset(): bool
+    {
+        $this->clearListeners();
+        $this->stop = [];
+        $this->mock = [];
+        $this->testing = true;
+        return true;
+    }
+
+    /**
+     * Remove specific listener
+     *
+     * @param  string   $hook     [description]
+     * @param  callable $function [description]
+     * @return [type]             [description]
+     */
     public function removeListener(string $hook, callable $function): bool
     {
         foreach ($this->watch[$hook] as $priority => $hooks) {
