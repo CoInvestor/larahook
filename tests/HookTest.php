@@ -24,7 +24,7 @@ class HookTest extends TestCase
             'test_name',
             ['arg1', 'arg2'],
             function ($arg1, $arg2) {
-                return $arg1.$arg2;
+                return $arg1 . $arg2;
             }
         );
 
@@ -46,7 +46,7 @@ class HookTest extends TestCase
         $this->assertFalse(Hook::hasListeners('test_name'));
 
         Hook::listen('test_name', function ($callback, $output, $arg1, $arg2) {
-            return 'hooked'.$arg1.$arg2.$callback->call();
+            return 'hooked' . $arg1 . $arg2 . $callback->call();
         }, 1);
 
         $result = Hook::get(
@@ -63,14 +63,14 @@ class HookTest extends TestCase
     public function testGetListenersRun()
     {
         Hook::listen('test_name', function ($callback, $output, $arg1, $arg2) {
-            return 'hooked'.$arg1.$arg2.$callback->call();
+            return 'hooked' . $arg1 . $arg2 . $callback->call();
         }, 1);
 
         $result = Hook::get(
             'test_name',
             ['arg1', 'arg2'],
             function ($arg1, $arg2) {
-                return $arg1.$arg2;
+                return $arg1 . $arg2;
             }
         );
 
@@ -85,14 +85,14 @@ class HookTest extends TestCase
     public function testGetListenersRunWithDefaultOn()
     {
         Hook::listen('test_name', function ($callback, $output, $arg1, $arg2) {
-            return $output.'hooked';
+            return $output . 'hooked';
         }, 1);
 
         $result = Hook::get(
             'test_name',
             ['arg1', 'arg2'],
             function ($arg1, $arg2) {
-                return $arg1.$arg2;
+                return $arg1 . $arg2;
             },
             true
         );
@@ -135,18 +135,18 @@ class HookTest extends TestCase
     public function testStop()
     {
         Hook::listen('test', function ($callback, $output, $data) {
-            return $data.$output.'1';
+            return $data . $output . '1';
         });
         Hook::listen('test', function ($callback, $output, $data) {
             Hook::stop('test');
 
-            return $output.'2';
+            return $output . '2';
         });
         Hook::listen('test', function ($callback, $output, $data) {
-            return $output.'3';
+            return $output . '3';
         });
         Hook::listen('test', function ($callback, $output, $data) {
-            return $output.'4';
+            return $output . '4';
         });
 
         // Ensure stop only persists for current chain
@@ -322,12 +322,12 @@ class HookTest extends TestCase
     public function testRemoveListener()
     {
         $method = function ($callback, $output) {
-            return $output.'AAA';
+            return $output . 'AAA';
         };
 
         Hook::listen('test', $method);
         Hook::listen('test', function ($callback, $output) {
-            return $output.'BBB';
+            return $output . 'BBB';
         });
 
         $this->assertEquals('AAABBB', Hook::get('test', [], function () {
@@ -341,7 +341,7 @@ class HookTest extends TestCase
         }));
 
         Hook::listen('test', function ($callback, $output) {
-            return $output.'CCC';
+            return $output . 'CCC';
         });
 
         $this->assertEquals('BBBCCC', Hook::get('test', [], function () {
@@ -355,12 +355,12 @@ class HookTest extends TestCase
     public function testRemoveListeners()
     {
         $method = function ($callback, $output) {
-            return $output.'AAA';
+            return $output . 'AAA';
         };
 
         Hook::listen('test', $method);
         Hook::listen('test', function ($callback, $output) {
-            return $output.'BBB';
+            return $output . 'BBB';
         });
 
         $this->assertEquals('AAABBB', Hook::get('test', [], function () {
@@ -380,12 +380,12 @@ class HookTest extends TestCase
     public function testClearListeners()
     {
         $method = function ($callback, $output) {
-            return $output.'AAA';
+            return $output . 'AAA';
         };
 
         Hook::listen('test', $method);
         Hook::listen('test', function ($callback, $output) {
-            return $output.'BBB';
+            return $output . 'BBB';
         });
 
         $this->assertEquals('AAABBB', Hook::get('test', [], function () {
@@ -405,13 +405,13 @@ class HookTest extends TestCase
     public function testReset()
     {
         $method = function ($callback, $output) {
-            return $output.'AAA';
+            return $output . 'AAA';
         };
 
         // Listeners
         Hook::listen('test', $method);
         Hook::listen('test', function ($callback, $output) {
-            return $output.'BBB';
+            return $output . 'BBB';
         });
 
         $this->assertEquals('AAABBB', Hook::get('test', [], function () {
