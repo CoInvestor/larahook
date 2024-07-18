@@ -24,7 +24,7 @@
     "require-dev": {
         "squizlabs/php_codesniffer": "4.0.x-dev",
         "orchestra/testbench": "^9.2",
-        "phpunit/phpunit": "^11"
+        "phpunit/phpunit": "^11.14"
     },
     "autoload": {
         "psr-4": {
