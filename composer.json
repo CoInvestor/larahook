@@ -19,7 +19,7 @@
     "minimum-stability": "dev",
     "require": {
         "php": ">=8.2",
-        "laravel/framework": "^11.14"
+        "laravel/framework": "^11|^12"
     },
     "require-dev": {
         "squizlabs/php_codesniffer": "4.0.x-dev",
