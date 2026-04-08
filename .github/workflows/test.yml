@@ -6,7 +6,7 @@ jobs:
   tests:
     runs-on: ubuntu-24.04
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
     - name: Install vendor
       run: composer install
     - name: Run linting
